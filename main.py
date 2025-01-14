@@ -200,3 +200,24 @@ imputer.fit(housing_num)
 X = imputer.transform(housing_num)
 housing_tr = pd.DataFrame(X, columns=housing_num.columns,
                           index=housing_num.index)
+
+housing_cat = housing[["ocean_proximity"]]
+# print(housing_cat.head(10))
+
+# 머신러닝 알고리즘은 텍스트가 아닌 숫자를 다루기 위한 변환 클래스
+
+# OrdinalEncoder 순서가 있는 인코딩 방식
+from sklearn.preprocessing import OrdinalEncoder
+ordinal_encoder = OrdinalEncoder()
+housing_cat_encoder = OrdinalEncoder()
+housing_cat_encoded = ordinal_encoder.fit_transform(housing_cat)
+
+# print(housing_cat_encoded[:10])
+# print(ordinal_encoder.categories_)
+
+from sklearn.preprocessing import OneHotEncoder
+cat_encoder = OneHotEncoder()
+housing_cat_1hot = cat_encoder.fit_transform(housing_cat)
+# 다차원 희소 행렬을 2차원 배열로 출력
+print(housing_cat_1hot.toarray())
+print(cat_encoder.categories_)
