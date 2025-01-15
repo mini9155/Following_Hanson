@@ -28,6 +28,9 @@ learning machine_learing with hanson
 
 #### 사이킷런의 설계 철학
 
+- 사이킷런은 상속이 아닌 덕 타이핑을 지원한다.
+- 덕 타이핑이란?
+    - 파이썬에서는 
 1. 일관성 : 모든 객체가 일관되고 단순환 인터페이스를 공유
     - 추정기 (estimator)
         * 데이터셋을 기반으로 일련의 모델 파라미터들을 추정하는 객체이며 추정은 fit() 수행되고, 추정 과정에서 필요한 매개변수는 하이퍼파라미터로 간주되고 인스턴스 변수로 저장됩니다.
@@ -45,7 +48,14 @@ learning machine_learing with hanson
     - 빠른 실행을 위한 디폴트 매게변수에 기본값을 지정
 
 
-    
+# 용어 정리
+
+1. feature sacling - 특성 스케일링
+2. standardization - 표준화
+3. nomalization - 정규화
+
+
+
 
 
 

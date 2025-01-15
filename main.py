@@ -221,3 +221,79 @@ housing_cat_1hot = cat_encoder.fit_transform(housing_cat)
 # 다차원 희소 행렬을 2차원 배열로 출력
 print(housing_cat_1hot.toarray())
 print(cat_encoder.categories_)
+# 106p
+
+from sklearn.base import BaseEstimator, TransformerMixin
+
+rooms_ix, bedrooms_ix, population_ix, household_ix = 3, 4, 5, 6
+
+# BaseEstimator 은 sklearn 의 추정기 표준을 따르기 위해 사용
+# TransformerMixin 은 .fit() 과 .transform() 매서드릴 가진 반환기를 구성하기 쉽게 해준다.
+class CombinedAttributesAdder(BaseEstimator, TransformerMixin):
+    def __init__(self, add_bedrooms_per_room = True):
+        self.add_bedrooms_per_room = add_bedrooms_per_room
+    
+    def fit(self, X, y=None):
+        return self
+    def transform(self, X):
+        rooms_per_household = X[:, rooms_ix] / X[:,household_ix]
+        population_per_household = X[:,population_ix] / X[:,household_ix]
+        if(self.add_bedrooms_per_room):
+            bedrooms_per_room = X[:,bedrooms_ix] / X[:,rooms_ix]
+            # C_는 새로운 열을 X에 추가
+            return np.c_[X,rooms_per_household, population_per_household, bedrooms_per_room]
+        
+        else:
+            return np.c_[X,rooms_per_household, population_per_household]
+        
+attr_adder = CombinedAttributesAdder(add_bedrooms_per_room=False)
+housing_extra_atrribs = attr_adder.transform(housing.values)
+
+#_get_params, set_params 함수는 사이킷런의 파이프라인과 그리드 탐색에 꼭 필요한 메서드이다.
+# 모든 추정기 변환기는 BaseEstimator을 상속해야함.
+
+"""
+전체방의 개수는 6 ~ 39.320인 반면 중간 소득의 범위는 0 에서 15이다.
+모든 특성의 범위를 같게 만들어 줘야 한다.
+주로 min-max 스케일링과 표준화가 널리 사용된다.
+
+min-max 스케일링
+- 데이터에서 최소값을 뺀 후 최댓값과 최솟값의 차이로 나눈다.
+- 해당하는 함수는 MinMaxScaler, 만약 0 ~ 1 사이를 원하지 않는다면 feature_range 매개변수로 범위를 정할 수 있다.
+
+표준화
+- 먼저 평균을 뺀 후 표준편차로 나누어 결과 분포의 분산이 1이 되도록 함.
+"""
+
+# 변환 파이프라인
+
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+
+num_pipeline = Pipeline([
+    # 결측값을 채우는 변환기, 중앙값으로 채움
+    ("imputer",SimpleImputer(strategy="median")),
+    # 사용자 정의 변환기
+    ("attribs_adder",CombinedAttributesAdder()),
+    # 데이터를 정규화함
+    ("std_scaler",StandardScaler()),
+])
+
+housing_num_tr = num_pipeline.fit_transform(housing_num)
+
+from sklearn.compose import ColumnTransformer
+
+num_attribs = list(housing_num)
+cat_attribs = ["ocean_proximity"]
+
+full_pipeline = ColumnTransformer([
+    ("num",num_pipeline, num_attribs),
+    ("cat",OneHotEncoder(), cat_attribs)
+])
+
+housing_prepared = full_pipeline.fit_transform(housing)
+
+from sklearn.linear_model import LinearRegression
+
+lin_reg = LinearRegression()
+lin_reg
