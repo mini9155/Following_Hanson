@@ -219,8 +219,8 @@ from sklearn.preprocessing import OneHotEncoder
 cat_encoder = OneHotEncoder()
 housing_cat_1hot = cat_encoder.fit_transform(housing_cat)
 # 다차원 희소 행렬을 2차원 배열로 출력
-print(housing_cat_1hot.toarray())
-print(cat_encoder.categories_)
+# print(housing_cat_1hot.toarray())
+# print(cat_encoder.categories_)
 # 106p
 
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -296,4 +296,55 @@ housing_prepared = full_pipeline.fit_transform(housing)
 from sklearn.linear_model import LinearRegression
 
 lin_reg = LinearRegression()
-lin_reg
+lin_reg.fit(housing_prepared, housing_labels)
+
+some_data = housing.iloc[:5]
+some_labels = housing_labels.iloc[:5]
+
+some_data_prepared = full_pipeline.transform(some_data)
+# print(f"예측 : {lin_reg.predict(some_data_prepared)}")
+# print(f"레이블 : {list(some_labels)}")
+
+from sklearn.metrics import mean_squared_error
+# # 전처리된 데이터 예측
+# housing_predictions = lin_reg.predict(housing_prepared)
+# # MSE 평균 제곱근 오차 계산
+# lin_mse = mean_squared_error(housing_labels, housing_predictions)
+# # RMSE 평균 제곱근 오차를 구하는 sqrt 함수(제곱근 생성)
+# lin_rmse = np.sqrt(lin_mse)
+
+
+# from sklearn.tree import DecisionTreeRegressor
+
+# tree_reg = DecisionTreeRegressor()
+# tree_reg.fit(housing_prepared, housing_labels)
+# housing_predictions = tree_reg.predict(housing_prepared)
+# tree_mse = mean_squared_error(housing_labels, housing_predictions)
+# tree_rmse = np.sqrt(tree_mse)
+
+from sklearn.model_selection import cross_val_score
+
+# scores = cross_val_score(tree_reg, housing_prepared, housing_labels,
+#                          scoring="neg_mean_squared_error",cv=10)
+# tree_rmse_scores = np.sqrt(-scores)
+
+
+def display_scores(scores):
+    print("점수 : ", scores)
+    print("평균 : ", scores.mean())
+    print("표준편차 : ", scores.std())
+
+# display_scores(scores=tree_rmse_scores)
+
+# lin_scores = cross_val_score(lin_reg, housing_prepared, housing_labels,
+#                              scoring="neg_mean_squared_error", cv=10)
+# lin_rmse_scores = np.sqrt(-lin_scores)
+# # display_scores(lin_rmse_scores)
+
+from sklearn.ensemble import RandomForestRegressor
+forest_reg = RandomForestRegressor()
+forest_reg.fit(housing_prepared, housing_labels)
+housing_predictions = forest_reg.predict(housing_prepared)
+forest_mse = mean_squared_error(housing_labels, housing_predictions)
+forest_rmse = np.sqrt(forest_mse)
+display_scores(forest_rmse)
